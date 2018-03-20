@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Tumblr tools",
   "author": "Jul11Co <jul.eleven.co@gmail.com>",
+  "repository": "https://github.com/jul11co/jul11co-tumblr-tools",
   "bin": {
     "tumblr-archive": "./tumblr-archive.js",
     "tumblr-browse-posts": "./tumblr-browse-posts.js",
@@ -24,7 +25,6 @@
     "fs-extra": "^2.1.2",
     "jul11co-jobqueue": "0.0.1",
     "jul11co-jsonstore": "0.0.1",
-    "jul11co-sitescraper": "0.0.2",
     "jul11co-utils": "^0.1.0",
     "jul11co-wdt": "^1.1.12",
     "lockfile": "^1.0.3",
