@@ -1,0 +1,1676 @@
+<html>
+  <head>
+    <%if (is_live) {%>
+    <title>Tumblr Live Browser</title>
+    <%}else{%>
+    <title>Tumblr Archive Browser</title>
+    <%}%>
+    <meta name="referrer" content="no-referrer">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/animate.css"> -->
+
+    <link rel="stylesheet" href="/css/app.min.css">
+
+    <!-- <script src="/js/jquery-3.2.1.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/jquery.lazyload.min.js"></script>
+    <script src="/js/socket.io.slim.js"></script>
+    <script src="/js/moment.min.js"></script>
+    <script src="/js/snuownd.min.js"></script> -->
+
+    <script src="/js/app.min.js"></script>
+
+    <style type="text/css">
+      table#items tr.item-post {
+        cursor: pointer;
+      }
+      .scrollable-menu {
+        height: auto;
+        max-height: 400px;
+        overflow-x: hidden;
+      }
+      .icon-invisible {
+        visibility: hidden;
+      }
+      .modal-dialog {
+        margin: 5px auto;
+        width: calc(100% - 85px);
+      }
+      .modal-content {
+        border: 1px solid black;
+        border-radius: 0;
+      }
+      @media (max-width: 768px) {
+        .modal-dialog {
+          /*width: calc(100% - 15px);*/
+          margin: 0;
+          width: 100%;
+        }
+      }
+      .modal-header {
+        padding: 5px 15px;
+      }
+      #sidebar {
+        float: left;
+        width: 220px;
+      }
+      #sidebar ul {
+        list-style: none;
+        padding-left: 0;
+      }
+      .list-group .sub-items {
+        display: none;
+      }
+      .list-group .sub-items.active {
+        display: block;
+      }
+      .list-group-item {
+        padding: 5px 15px;
+      }
+      #main-content {
+        margin-left: 240px;
+      }
+      @media (min-width: 768px) {
+        #blogs-selection {
+          display: none;
+        }
+      }
+      @media (max-width: 768px) {
+        #blogs-selection {
+          display: block;
+        }
+        #sidebar {
+          display: none;
+        }
+        #main-content {
+          margin-left: 0;
+        }
+      }
+      #post-preview-body {
+        padding: 0;
+        background: black;
+      }
+      #post-preview-header {
+        position: absolute;
+        text-align: center;
+        margin-bottom: 0;
+        width: 100%;
+        color: white;
+        /*background-color: rgba(128, 128, 128, 0.35);*/
+        background-color: transparent;
+        z-index: 3001;
+      }
+      @media (max-width: 768px) {
+        #post-preview-header {
+          background-color: transparent;
+        }
+      }
+      #post-preview-file-info-container {
+        position: absolute;
+        left: 10px;
+        z-index: 3002;
+      }
+      /*@media (max-width: 768px) {
+        #post-preview-file-info-container {
+          left: 5px;
+          color: white;
+          background-color: black;
+          border-radius: 4px;
+          padding: 3px;
+          text-align: left;
+        }
+        #post-preview-file-info {
+          display: none;
+        }
+        #post-preview-file-info-container:hover #post-preview-file-info {
+          display: inline-block;
+        }
+      }*/
+      #post-preview-top-right {
+        position: absolute;
+        top: 3px;
+        right: 3px;
+      }
+      #post-preview-top-right a {
+        text-decoration: none;
+      }
+      .post-preview-button {
+        /*color: rgb(157, 157, 157);*/
+        color: rgb(108, 108, 108);
+      }
+      .post-preview-button:hover,
+      .post-preview-button:active,
+      .post-preview-button:focus {
+        color: white;
+      }
+      .post-preview-big-button {
+        z-index: 3001;
+        /*background-color: rgba(49, 49, 49, 0.68);*/
+        background-color: rgba(128, 128, 128, 0.35);
+        border-radius: 4px;
+        padding: 15px 10px 10px;
+      }
+      .post-preview-small-button {
+        z-index: 3001;
+        /*background-color: rgba(49, 49, 49, 0.68);*/
+        background-color: rgba(128, 128, 128, 0.35);
+        border-radius: 4px;
+        padding: 5px 5px;
+      }
+      .post-preview-notification {
+        z-index: 3001;
+        color: white;
+        /*background-color: rgba(49, 49, 49, 0.68);*/
+        background-color: rgba(128, 128, 128, 0.35);
+        border-radius: 4px;
+        padding: 3px 10px;
+      }
+      #post-preview-close-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+      }
+      #post-preview-external-link-button {
+        position: absolute;
+        top: 60px;
+        right: 10px;
+      }
+      #post-preview-open-tumblr-button {
+        position: absolute;
+        top: 110px;
+        right: 10px;
+      }
+      #post-preview-image-resize-button {
+        position: absolute;
+        top: 160px;
+        right: 10px;
+        text-decoration: none;
+      }
+      #post-preview-favorite-button {
+        position: absolute;
+        top: 210px;
+        right: 10px;
+      }
+      #post-preview-download-button {
+        position: absolute;
+        top: 260px;
+        right: 10px;
+      }
+      #post-preview-favorite-notification {
+        position: absolute;
+        top: 215px;
+        right: 60px;
+      }
+      #post-preview-download-notification {
+        position: absolute;
+        top: 265px;
+        right: 60px;
+      }
+      #post-preview-tags-container {
+        position: absolute;
+        left: 10px;
+        top: 30px;
+        z-index: 3001;
+        text-align: left;
+      }
+      #post-preview-tags-hide {
+        position: absolute;
+        left: 15px;
+        top: 25px;
+        z-index: 3001;
+      }
+      #post-preview-tags-show {
+        position: absolute;
+        left: 15px;
+        top: 25px;
+        z-index: 3001;
+      }
+      .post-preview-tag {
+        display: block;
+        margin: 5px;
+      }
+      @media (max-width: 768px) {
+        .post-preview-tag {
+          margin: 10px 0;
+        }
+      }
+      .post-preview-tag span {
+        color: white;
+        /*background-color: rgba(49, 49, 49, 0.68);*/
+        background-color: rgba(128, 128, 128, 0.35);
+        border-radius: 4px;
+        padding: 3px 10px;
+      }
+      .post-preview-tag a {
+        color: rgb(170, 170, 170);
+        text-decoration: none;
+      }
+      .post-preview-tag a:hover {
+        color: white;
+      }
+      #post-preview-comments-container {
+        position: absolute;
+        left: 10px;
+        top: 30px;
+        z-index: 3001;
+        text-align: left;
+        max-width: 300px;
+      }
+      #post-preview-comments-container.inline {
+        position: relative;
+        z-index: 3001;
+        text-align: left;
+        max-width: 100%;
+        padding-left: 100px;
+        padding-right: 100px;
+        padding-bottom: 20px;
+        max-height: none;
+        margin: 10px auto;
+        padding-bottom: 20px;
+      }
+      #post-preview-comments-container.fixed #post-preview-comments {
+        max-height: 100%;
+        overflow-y: scroll;
+      }
+      #post-preview-comments-toggle,
+      #post-preview-comments-hide,
+      #post-preview-comments-show,
+      #post-preview-comments-inline,
+      #post-preview-comments-align {
+        /*position: fixed;
+        left: 15px;
+        top: 30px;*/
+        z-index: 3001;
+        /*max-height: 100%;*/
+        text-decoration: none;
+      }
+      /*@media (max-width: 768px) {
+        #post-preview-comments {
+          display: none;
+        }
+      }*/
+      .post-preview-comment {
+        display: block;
+        margin: 5px;
+      }
+      .post-preview-comment {
+        color: white;
+        background-color: rgba(49, 49, 49, 0.68);
+        border-radius: 4px;
+        padding: 3px 10px;
+        max-width: 100%;
+        /*white-space: nowrap;*/
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .post-preview-comment .date {
+        font-weight: bold;
+        font-size: 12px;
+      }
+      .post-preview-comment a {
+        color: orange;
+      }
+      #post-preview-content-container {
+        position: relative;
+        height: 100%;
+      }
+      #post-preview-content-container.to-right {
+        margin-left: 315px;
+      }
+      #post-preview-item-title-container {
+        position: absolute;
+        text-align: center;
+        margin: 0 auto;
+        left: 0;
+        right: 0;
+        bottom: 60px;
+        z-index: 3001;
+      }
+      #post-preview-item-title {
+        color: white;
+        /*background-color: rgba(49, 49, 49, 0.68);*/
+        background-color: rgba(128, 128, 128, 0.35);
+        border-radius: 4px;
+        padding: 3px 10px;
+      }
+      #post-preview-content {
+        position: relative;
+        text-align: center;
+        display: block;
+        margin: 0 auto;
+        height: 100%;
+        /*cursor: pointer;*/
+        overflow-y: scroll;
+      }
+      #post-preview-content img.fit {
+        max-width: 100%;
+        max-height: 100%;
+      }
+      #post-preview-content img.fit-width {
+        max-width: 100%;
+      }
+      #post-preview-content img.fit-height {
+        max-height: 100%;
+      }
+      #post-preview-content img.max {
+        max-width: none;
+        max-height: none;
+      }
+      #post-preview-content img.extra {
+        display: block;
+        margin: 5px auto;
+        min-height: 50px;
+      }
+      #post-preview-content video {
+        max-width: 100%;
+        max-height: 100%;
+        margin-top: 20px;
+      }
+      #post-preview-left {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100px;
+        height: 90%;
+        z-index: 3000;
+        cursor: pointer;
+      }
+      #post-preview-right {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 90%;
+        z-index: 3000;
+        cursor: pointer;
+      }
+      @media (max-width: 768px) {
+        #post-preview-left,
+        #post-preview-right {
+          width: 40px;
+        }
+      }
+      .post-info-extra {
+        font-size: 12px;
+        color: grey;
+        margin-bottom: 0;
+        margin-top:5px;
+        padding-left: 21px;
+      }
+      .item-post blockquote {
+        font-size: 14px;
+        border-left: 5px solid #4c90ee;
+        background-color: #efefef;
+      }
+      .text-warning {
+        color: orange;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class="container">
+
+      <h3 style="text-align: center;">
+        <%if (is_live) {%>
+        <span class="text-primary"><i class="fa fa-tumblr fa-fw"></i> <a href="/" style="text-decoration: none;">Tumblr Browser</a> <small><span class="label label-success">LIVE</span></small></span>
+        <%}else{%>
+        <span class="text-primary"><i class="fa fa-tumblr fa-fw"></i> <a href="/" style="text-decoration: none;">Tumblr Archive Browser</a></span>
+        <%}%>
+      </h3>
+
+      <div id="sidebar">
+        <div class="row">
+          <div class="col-md-12">
+            <div>
+              <p>Blogs (<%=tumblr_blogs.length%>): <a href="/?reload_blogs=1" class="btn btn-default" title="Reload blog list"><i class="fa fa-refresh fa-fw"></i></a> <a href="#" id="toggle-add-blog-form" class="btn btn-default" title="Toggle add blog"><i class="fa fa-plus fa-fw"></i></a></p>
+              <form id="add-blog-form" class="hidden" role="form" action="/add_blog" method="POST">
+                <div class="input-group">
+                  <input id="blog-name" type="text" name="blog" class="form-control" value="" placeholder="Enter blog name">
+                  <span class="input-group-btn">
+                    <button id="add-blog-form-submit" class="btn btn-default" type="submit">Add</button>
+                  </span>
+                </div>
+              </form>
+
+              <%if (tumblr_starred_blogs.length) {%>
+              <div class="list-group">
+                <%tumblr_starred_blogs.forEach(function(blog,idx){%>
+                <a class="list-group-item <%if(blog.name == current_blog){%>active<%}%>" href="/?load_blog=<%=blog.name%>"><i class="fa fa-tumblr-square fa-fw"></i> <%=trimText(blog.name,15)%> <%if(blog.nsfw){%><span class="label label-danger">NSFW</span><%}%> <span><i class="fa fa-star fa-fw"></i></span> <%if (features.enable_archive && features.enable_archive_warning && !blog.archived){%><span class="text-warning"><i class="fa fa-exclamation-circle fa-fw"></i></span><%}%></a>
+                <%});%>
+              </div>
+              <%}%>
+
+              <%if (tumblr_unstarred_blogs.length) {%>
+              <%if (!tumblr_blog_grouped) {%>
+              <div class="list-group">
+                <%tumblr_unstarred_blogs.forEach(function(blog,idx){%>
+                <a class="list-group-item <%if(blog.name == current_blog){%>active<%}%>" href="/?load_blog=<%=blog.name%>"><i class="fa fa-tumblr-square fa-fw"></i> <%=trimText(blog.name,18)%> <%if (features.enable_archive && features.enable_archive_warning && !blog.archived){%><span class="label label-warning"><i class="fa fa-exclamation fa-fw"></i></span><%}%></a>
+                <%});%>
+              </div>
+              <%} else {%>
+              <div class="list-group">
+                <%for(var group_name in tumblr_blog_groups){%>
+                <%  var group = tumblr_blog_groups[group_name];%>
+                <a class="list-group-item sub" href="#"><%=group_name%> <span class="badge badge-primary"><%=group.length%></span> </a>
+                <ul class="sub-items">
+                  <%group.forEach(function(blog,idx){%>
+                  <a class="list-group-item <%if(blog.name == current_blog){%>active<%}%>" href="/?load_blog=<%=blog.name%>"><i class="fa fa-tumblr-square fa-fw"></i> <%=trimText(blog.name,18)%> <%if (features.enable_archive && features.enable_archive_warning && !blog.archived){%><span class="text-warning"><i class="fa fa-exclamation-circle fa-fw"></i></span><%}%></a>
+                  <%});%>
+                </ul>
+                <%}%>
+              </div>
+              <%}%>
+              <%}%>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="main-content">
+      <div class="row">
+        <div class="col-md-12">
+        <%if (tumblr_blogs && tumblr_blogs.length) {%>
+        
+        <div id="blogs-selection" style="margin: 15px 0;">
+          <span>Select blog (<%=tumblr_blogs.length%>): </span>
+          <div class="dropdown" style="display: inline-block;">
+            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-tumblr-square fa-fw"></i> <%=current_blog%>
+            <span class="caret"></span></button>
+            <ul class="dropdown-menu scrollable-menu">
+              <%tumblr_blogs.forEach(function(blog,idx){%>
+              <li class="<%if(blog.name == current_blog){%>active<%}%>"><a href="/?load_blog=<%=blog.name%>"><i class="fa fa-tumblr-square fa-fw"></i> <%=blog.name%> <%if(blog.starred){%><span><i class="fa fa-star fa-fw"></i></span><%}%> <%if (features.enable_archive && !blog.archived){%><span class="text-warning"><i class="fa fa-exclamation-circle fa-fw"></i></span><%}%></a></li>
+              <%});%>
+            </ul>
+          </div>
+          <a href="/?reload_blogs=1" class="btn btn-default" title="Reload blog list"><i class="fa fa-refresh fa-fw"></i></a>
+        </div>
+        <%}%>
+
+        <%var current_blog_starred = false;
+        var current_blog_archived = false;
+        tumblr_blogs.forEach(function(blog){
+          if (blog.name == current_blog) {
+            current_blog_starred = blog.starred;
+            current_blog_archived = blog.archived;
+          }
+        });%>
+        <h4><a href="https://<%=current_blog%>.tumblr.com/" target="_blank"><i class="fa fa-tumblr-square fa-fw"></i><%=current_blog%>.tumblr.com</a> <small class="hidden" id="blog-status"></small> <a href="#" class="btn btn-default toggle-this-blog-star" data-blog="<%=current_blog%>" data-starred="<%=(current_blog_starred?'true':'false')%>" title="Toggle this blog star"><%if(current_blog_starred){%><i class="fa fa-star fa-fw"></i><%}else{%><i class="fa fa-star-o fa-fw"></i><%}%></a> <a href="#" id="toggle-search-post-form" class="btn btn-default" title="Toggle search"><i class="fa fa-search fa-fw"></i></a></h4>
+
+        <div style="margin: 15px auto;">
+          <form id="search-post-form" class="<%if(!query.q){%>hidden<%}%>" role="form" action="/" method="GET">
+            <div class="input-group">
+              <input id="search-query" type="text" name="q" class="form-control" value="<%=query.q||''%>" placeholder="Search posts">
+              <span class="input-group-btn">
+                <button id="search-post-form-submit" class="btn btn-default" type="submit">Search</button>
+              </span>
+            </div>
+          </form>
+        </div>
+
+        <p>
+          <a href="/"><b>All Posts</b> (<%=posts_count%>)</a>,
+          <a href="/?photos=1"><b>Photos</b> (<%=photo_posts_count%>)</a>,
+          <a href="/?videos=1"><b>Videos</b> (<%=video_posts_count%>)</a>,
+          <%if (audio_posts_count>0){%><a href="/?audio=1"><b>Audio</b> (<%=audio_posts_count%>)</a>,<%}%>
+          <%if (link_posts_count>0){%><a href="/?links=1"><b>Links</b> (<%=link_posts_count%>)</a>,<%}%>
+          <%if (conversation_posts_count>0){%><a href="/?conversations=1"><b>Conversations</b> (<%=conversation_posts_count%>)</a>,<%}%>
+          <%if (quote_posts_count>0){%><a href="/?quotes=1"><b>Quotes</b> (<%=quote_posts_count%>)</a>,<%}%>
+          <%if (chat_posts_count>0){%><a href="/?chats=1"><b>Chats</b> (<%=chat_posts_count%>)</a>,<%}%>
+          <a href="/?favorites=1"><b>Favorites</b> (<%=favorite_posts_count%>)</a>
+        </p>
+
+        <div id="popular-section" class="hidden-sm hidden-xs">
+        <%if (popular_blogs && popular_blogs.length) {%>
+        <p>
+          Popular Blogs: 
+          <%popular_blogs.forEach(function(blog,idx){%>
+          <a href="/?blog=<%=blog.name%>"><%=blog.name%> (<%=blog.posts_count%>)</a><%if(idx < popular_blogs.length-1){%>,<%}%>
+          <%});%>
+        </p>
+         <%}%>
+        <%if (popular_reblogs && popular_reblogs.length) {%>
+        <p>
+          Popular Reblogs: 
+          <%popular_reblogs.forEach(function(reblog,idx){%>
+          <a href="/?reblog=<%=reblog.name%>"><%=reblog.name%> (<%=reblog.posts_count%>)</a><%if(idx < popular_reblogs.length-1){%>,<%}%>
+          <%});%>
+          , <a href="/all-reblogs"><b>show all reblogs...</b></a>
+        </p>
+         <%}%>
+        <%if (popular_years && popular_years.length) {%>
+        <p>
+          Popular Years: 
+          <%popular_years.forEach(function(year,idx){%>
+          <a href="/?year=<%=year.name%>"><%=year.name%> (<%=year.posts_count%>)</a><%if(idx < popular_years.length-1){%>,<%}%>
+          <%});%>
+        </p>
+         <%}%>
+        <%if (popular_tags && popular_tags.length) {%>
+        <p>
+          Popular Tags: 
+          <%popular_tags.forEach(function(tag,idx){%>
+          <a href="/?tag=<%=tag.name%>">#<%=tag.name%> (<%=tag.posts_count%>)</a><%if(idx < popular_tags.length-1){%>,<%}%>
+          <%});%> 
+          , <a href="/all-tags"><b>show all tags...</b></a>
+        </p>
+        <%}%>
+        </div>
+
+        <%if (query.photos) {%>
+        <h3>Photos</h3>
+        <%}else if (query.videos) {%>
+        <h3>Videos</h3>
+        <%}else if (query.favorites) {%>
+        <h3>Favorite Posts</h3>
+        <%}else if (query.blog) {%>
+        <h3><span style="color: grey;">Blog:</span> <%=query.blog%> <small><%if(is_live){%><a href="/?load_blog=<%=query.blog%>" title="Browse blog: <%=query.blog%>">browse this blog</a> | <%}%><a href="#" class="tumblr-add-blog <%if(!features.enable_archive){%>hidden<%}%>" data-blog-name="<%=query.blog%>" title="Archive blog: <%=query.blog%>">archive this blog</a></small></h3>
+        <%}else if (query.reblog) {%>
+        <h3><span style="color: grey;">Reblog:</span> <%=query.reblog%> <small><%if(is_live){%><a href="/?load_blog=<%=query.reblog%>" title="Browse blog: <%=query.reblog%>">browse this blog</a> | <%}%><a href="#" class="tumblr-add-blog <%if(!features.enable_archive){%>hidden<%}%>" data-blog-name="<%=query.reblog%>" title="Archive blog: <%=query.reblog%>">archive this blog</a> | <a href="#" class="tumblr-download-posts <%if(!features.enable_download){%>hidden<%}%>" data-reblog-name="<%=query.reblog%>" title="Download all posts reblogged from: <%=query.reblog%>">download posts</a></small></h3>
+        <%}else if (query.origin) {%>
+        <h3><span style="color: grey;">Origin:</span> <%=query.origin%> <small><%if(is_live){%><a href="/?load_blog=<%=query.origin%>" title="Browse blog: <%=query.origin%>">browse this blog</a> | <%}%><a href="#" class="tumblr-add-blog <%if(!features.enable_archive){%>hidden<%}%>" data-blog-name="<%=query.origin%>" title="Archive blog: <%=query.origin%>">archive this blog</a> | <a href="#" class="tumblr-download-posts <%if(!features.enable_download){%>hidden<%}%>" data-origin-name="<%=query.origin%>" title="Download all posts origin from: <%=query.origin%>">download posts</a></small></h3>
+        <%}else if (query.year) {%>
+        <h3><span style="color: grey;">Year:</span> <%=query.year%></h3>
+        <%}else if (query.tag) {%>
+        <h3><span style="color: grey;">Tag:</span> #<%=query.tag%> <small><a href="#" class="tumblr-download-posts <%if(!features.enable_download){%>hidden<%}%>" data-tag-name="<%=query.tag%>" title="Download all posts with tag: <%=query.tag%>">download posts</a></small></h3>
+        <%}else if (query.live_tag) {%>
+        <h3><span style="color: grey;">Tag:</span> #<%=query.live_tag%> <small><a href="#" class="tumblr-download-posts <%if(!features.enable_download){%>hidden<%}%>" data-tag-name="<%=query.live_tag%>" title="Download all posts with tag: <%=query.live_tag%>">download posts</a></small></h3>
+        <%}else if (query.q) {%>
+        <h3><span style="color: grey;">Search:</span> <%=query.q%> <small><a href="#" class="tumblr-download-posts <%if(!features.enable_download){%>hidden<%}%>" data-query="<%=query.q%>" title="Download all posts contained: <%=query.q%>">download posts</a></small></h3>
+        <%} else {%>
+        <h3>All Posts <small><%if(is_live && !current_blog_archived){%><a href="#" class="tumblr-add-blog <%if(!features.enable_archive){%>hidden<%}%>" data-blog-name="<%=current_blog%>" title="Archive blog: <%=current_blog%>">archive this blog</a> | <%}%><a href="#" class="tumblr-download-posts <%if(!features.enable_download){%>hidden<%}%>" title="Download all posts">download all posts</a></small></h3>
+        <%}%>
+
+        <%if (related_tags && related_tags.length) {%>
+        <p>
+          Related Tags: 
+          <%related_tags.forEach(function(tag,idx){%>
+          <a href="/?tag=<%=tag.name%>">#<%=tag.name%> (<%=tag.posts_count%>)</a><%if(idx < related_tags.length-1){%>,<%}%>
+          <%});%>
+        </p>
+        <%}%>
+
+        <%if (count != 1) {%>
+        <h5><%=count%> <%if(is_live && !live_posts){%>Archived<%}%> Posts</h5>
+        <%} else {%>
+        <h5>1 <%if(is_live && !live_posts){%>Archived<%}%> Post</h5>
+        <%}%>
+
+        <%
+        var base_comp = '';
+        if (query.photos){
+          base_comp = 'photos=1';
+        } else if (query.videos) {
+          base_comp = 'videos=1';
+        } else if (query.favorites) {
+          base_comp = 'favorites=1';
+        } else if (query.blog) {
+          base_comp = 'blog='+query.blog;
+        } else if (query.reblog) {
+          base_comp = 'reblog='+query.reblog;
+        } else if (query.origin) {
+          base_comp = 'origin='+query.origin;
+        } else if (query.year) {
+          base_comp = 'year='+query.year;
+        } else if (query.tag) {
+          base_comp = 'tag='+encodeURIComponent(query.tag);
+        } else if (query.live_tag) {
+          base_comp = 'live_tag='+encodeURIComponent(query.live_tag);
+        } else if (query.q) {
+          base_comp = 'q='+encodeURIComponent(query.q);
+        }
+        %>
+        
+        <%var query_skip = (query.skip ? parseInt(query.skip) : 0);%>
+        <%var next_skip = 0;%>
+        <%if (count>(query_skip+posts_limit)){%>
+        <%  next_skip = query_skip + posts_limit;%>
+        <p><%=(query_skip+1)%>-<%=(next_skip)%>, <a href="/?<%=base_comp%>&skip=<%=next_skip%>">more <%=(count-next_skip)%> posts...</a></p>
+        <%}else if (query_skip>0){%>
+        <p><%=(query_skip+1)%>-<%=count%></p>
+        <%}%>
+
+        <div style="overflow-x: auto;">
+        <table id="items" class="table table-hover table-responsive" style="font-size: 14px;">
+          <thead class="hidden-xs hidden-sm">
+            <tr>
+              <th style="max-width: 500px;">
+                <%if (!query.sort||query.sort=='title'){%>
+                  <%if(query.order=='desc'){%>
+                <a href="/?<%=base_comp%>&sort=title&order=asc">Title</a>
+                <i class="fa fa-angle-down fa-fw" style="color: grey;"></i>
+                  <%}else{%>
+                <a href="/?<%=base_comp%>&sort=title&order=desc">Title</a>
+                <i class="fa fa-angle-up fa-fw" style="color: grey;"></i>
+                  <%}%>
+                <%}else{%>
+                <a href="/?<%=base_comp%>&sort=title&order=desc">Title</a>
+                <%}%>
+              </th>
+              <th></th>
+              <th class="hidden-xs hidden-sm"></th>
+              <th class="hidden-xs hidden-sm"></th>
+              <th class="hidden-xs hidden-sm">
+                <%if (query.sort=='unix-timestamp'){%>
+                  <%if(query.order=='asc'){%>
+                <a href="/?<%=base_comp%>&sort=unix-timestamp&order=desc">Date Created</a>
+                <i class="fa fa-angle-up fa-fw" style="color: grey;"></i>
+                  <%}else{%>
+                <a href="/?<%=base_comp%>&sort=unix-timestamp&order=asc">Date Created</a>
+                <i class="fa fa-angle-down fa-fw" style="color: grey;"></i>
+                  <%}%>
+                <%}else{%>
+                <a href="/?<%=base_comp%>&sort=unix-timestamp&order=desc">Date Created</a>
+                <%}%>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+
+          <%posts.forEach(function(post, idx){%>
+            <tr class="item-post item-post-<%=post.type%>" 
+              data-post-id="<%=post.id%>" 
+              data-post-permalink="<%=post.url%>" 
+              data-post-link="<%=post.url%>" 
+              data-post-title="<%=post.slug||post.id%>" 
+              data-post-reblog="<%=post['reblogged-from-name']%>" 
+              data-post-blog="<%=post.tumblelog.name%>" 
+              data-post-created="<%=post['unix-timestamp']*1000%>"
+              data-post-live="<%=live_posts?'true':'false'%>"
+              data-post-favorite="<%=post.favorited?'true':'false'%>">
+              <a id="<%=post.id%>"></a>
+              <td style="max-width: 500px;">
+                <i class="fa fa-tumblr fa-fw" style="color: grey;"></i> <a style="color: black;text-orientation: none;" class="open-external-link" href="<%=post['url-with-slug']||post.url%>" target="_blank" title="<%=post.title%>"><b><%=ellipsisMiddle(post.slug||post.id,60)%></b></a> 
+                <p class="post-info-extra">
+                  <!-- <span class="label label-default"><%=post.type%></span> -->
+                  <%if (post.type=='photo'){%><i class="fa fa-picture-o fa-fw" style="color: grey;"></i>
+                  <%}else if (post.type=='video'){%><i class="fa fa-file-video-o fa-fw" style="color: grey;"></i>
+                  <%}else if (post.type=='link'){%><i class="fa fa-external-link fa-fw" style="color: grey;"></i>
+                  <%}else if (post.type=='quote'){%><i class="fa fa-quote-left fa-fw" style="color: grey;"></i>
+                  <%}else if (post.type=='conversation'){%><i class="fa fa-comments fa-fw" style="color: grey;"></i>
+                  <%}else{%><span class="label label-default"><%=post.type%></span>
+                  <%}%>
+                  <a href="<%=post.url%>" class="open-external-link" target="_blank" style="color: grey;"><%=ellipsisMiddle(post.url,80)%></a>
+                </p>
+                <p class="post-info-extra">
+                  <a class="open-external-link" href="/?blog=<%=post.tumblelog.name%>"><i class="fa fa-tumblr-square fa-fw" style="color: grey;"></i> <%=post.tumblelog.name%></a> <%if (post['reblogged-from-name']){%><a class="open-external-link" href="/?reblog=<%=post['reblogged-from-name']%>"><i class="fa fa-retweet fa-fw" style="color: grey;"></i> <%=post['reblogged-from-name']%></a> <a class="open-external-link" href="<%=post['reblogged-from-url']%>" target="_blank"><i class="fa fa-external-link fa-fw"></i></a><%}%> <%if (post['reblogged-root-name'] && post['reblogged-root-name']!=post['reblogged-from-name']){%><a class="open-external-link" href="/?origin=<%=post['reblogged-root-name']%>"><i class="fa fa-retweet fa-fw" style="color: grey;"></i> <%=post['reblogged-root-name']%></a> <a class="open-external-link" href="<%=post['reblogged-root-url']%>" target="_blank"><i class="fa fa-external-link fa-fw"></i></a><%}%>
+                </p>
+                <%if (post['photo-caption']){%>
+                <blockquote style="font-size: 14px;margin-bottom: 0;"><%-post['photo-caption']%></blockquote>
+                <%}else if (post['regular-body']){%>
+                <blockquote style="font-size: 14px;margin-bottom: 0;"><%-post['regular-body']%></blockquote>
+                <%}else if (post['quote-text']){%>
+                <blockquote style="font-size: 14px;margin-bottom: 0;"><%=post['quote-text']%> <p style="font-size: 12px;margin-top: 10px;">- <%-post['quote-source']%></p></blockquote>
+                <%}else if (post['conversation']&&post['conversation'].length){%>
+                <blockquote style="font-size: 14px;margin-bottom: 0;">
+                  <%post['conversation'].forEach(function(conv){%>
+                  <p><b><%=conv.label%></b> <%=conv.phrase%></p>
+                  <%})%>
+                </blockquote>
+                <%}else if (post['link-text']){%>
+                <blockquote style="font-size: 14px;margin-bottom: 0;"><a class="open-external-link" href="<%=post['link-url']%>" target="_blank"><%=post['link-text']%></a> <%-post['link-description']%></blockquote>
+                <%}%> 
+                <%if (post.tags && post.tags.length){%>
+                <p class="post-info-extra">
+                  <span><i class="fa fa-tags fa-fw" style="color: grey;"></i></span>
+                  <%post.tags.forEach(function(tag_name,idx){%>
+                  <%if(live_posts){%>
+                  <a class="open-external-link" href="/?live_tag=<%=tag_name%>">#<%=tag_name%></a><%if(idx<post.tags.length-1){%>,<%}%>
+                  <%}else{%>
+                  <a class="open-external-link" href="/?tag=<%=tag_name%>">#<%=tag_name%></a><%if(idx<post.tags.length-1){%>,<%}%>
+                  <%}%>
+                  <%});%>
+                </p>
+                <%}%>
+                <%if (post['unix-timestamp']){%>
+                <p class="post-info-extra hidden-lg hidden-md">
+                  <span><i class="fa fa-clock-o fa-fw" style="color: grey;"></i></span>
+                  <%=moment(post['unix-timestamp']*1000).format('MMM DD, YYYY hh:mm A')%>
+                </p>
+                <%}%>
+              </td>
+              <td>
+                <%if (post['photo-url-75'] && post['photo-url-75'].indexOf('http')==0){%>
+                  <img class="lazyload" src="data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=" 
+                    data-original="/image?src=<%=encodeURIComponent(post['photo-url-75'])%>" height="75" width="75" />
+                <%}%>
+              </td>
+              <td class="hidden-xs hidden-sm">
+                <%if (post.favorited) {%><a id="post-favorite-<%=post.id%>" href='#'><i class="fa fa-heart fa-fw"></i></a><%}else{%><a id="post-favorite-<%=post.id%>" href='#'><i class="fa fa-heart-o fa-fw"></i></a><%}%>
+              </td>
+              <td class="hidden-xs hidden-sm" style="color: grey;font-size: 12px;"><%if(post.type=='photo'){%><i class="fa fa-picture-o fa-fw"></i> <%=post.photos.length+1%><%}%></td>
+              <td class="hidden-xs hidden-sm date" style="color: grey;font-size: 12px;" data-created-utc="<%=post['unix-timestamp']*1000%>"><%if (post['unix-timestamp']){%><%=moment(post['unix-timestamp']*1000).format('MMM DD, YYYY hh:mm A')%><%}%></td>
+            </tr>
+          <%})%>
+
+          </tbody>
+        </table>
+        </div>
+
+        <%if (next_skip>0 && count>next_skip){%>
+        <p><a href="/?<%=base_comp%>&skip=<%=next_skip%>">and more <%=(count-next_skip)%> posts...</a></p>
+        <%}%>
+
+        </div>
+      </div><!-- row -->
+      </div><!-- main-content -->
+
+    </div><!-- container -->
+
+    <!-- Modal -->
+    <div id="previewModal" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+
+          <div class="modal-header hidden">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title"></h4>
+          </div>
+
+          <div class="modal-body" id="post-preview-body">
+            <div id="post-preview-header">
+              <span id="post-preview-file-info-container"><a id="post-preview-file-info-toggle" href="#" style="color: white;"><!-- <i class="fa fa-info-circle fa-fw"></i></a>  --><span id="post-preview-file-info"></span></span>
+              
+              <a href="#" id="post-preview-prev" class="post-preview-button" title="Next post (Left, Up)"><i class="fa fa-chevron-left fa-fw"></i></a>
+              <span id="post-preview-subtitle"></span>
+              <a href="#" id="post-preview-next" class="post-preview-button" title="Next post (Right, Down)"><i class="fa fa-chevron-right fa-fw"></i></a>
+              
+              <span id="post-preview-top-right" class="hidden"><a id="post-preview-close" href="#" class="post-preview-button" title="Close"><i class="fa fa-times fa-fw"></i></a></span>
+            </div>
+            
+            <div id="post-preview-actions">
+
+              <a id="post-preview-close-button" href="#" 
+                target="_blank" class="post-preview-button post-preview-big-button" 
+                title="Close preview"><i class="fa fa-times fa-lg fa-fw"></i></a>
+
+              <a id="post-preview-external-link-button" href="#" 
+                target="_blank" class="post-preview-button post-preview-big-button" 
+                title="Open external link"><i class="fa fa-external-link fa-lg fa-fw"></i></a>
+
+              <a id="post-preview-favorite-button" href="#" target="_blank" class="post-preview-button post-preview-big-button" 
+                  title="Toggle favorite this post (f)"><i class="fa fa-heart-o fa-lg fa-fw"></i></a>
+                  
+              <a id="post-preview-open-tumblr-button" href="#" target="_blank" 
+                class="post-preview-button post-preview-big-button" 
+                title="Open this post on Tumblr"><i class="fa fa-tumblr fa-lg fa-fw"></i></a>
+              
+              <a id="post-preview-image-resize-button" href="#" 
+                class="post-preview-button post-preview-big-button"
+                title="Toggle post image size (s)"><i class="fa fa-arrows fa-lg fa-fw"></i></a> 
+                 
+              <a id="post-preview-download-button" href="#" 
+                class="post-preview-button post-preview-big-button <%if(!features.enable_download){%>hidden<%}%>" 
+                title="Download this post (Enter, d)"><i class="fa fa-download fa-lg fa-fw"></i></a>
+            </div>
+
+            <div id="post-preview-notifications">
+              <span id="post-preview-favorite-notification" class="post-preview-notification hidden"></span>
+
+              <span id="post-preview-download-notification" class="post-preview-notification hidden"></span>
+            </div>
+
+            <div id="post-preview-content-container">
+
+              <div id="post-preview-item-title-container">
+                <span id="post-preview-item-title"></span>
+              </div>
+
+              <div id="post-preview-content">
+              </div>
+
+              <div id="post-preview-left"></div> 
+              <div id="post-preview-right"></div> 
+
+            </div>
+
+            <div id="post-preview-tags-container">
+            </div>
+
+            <div id="post-preview-comments-container" class="fixed hidden">
+              <div style="margin-bottom: 5px;">
+                <a id="post-preview-comments-toggle" href="#" class="post-preview-button post-preview-small-button" title="Toggle comments (c)"><i class="fa fa-comments fa-fw"></i> <span id="post-preview-num-comments" style="font-size: 12px;"></span></a>
+                
+                <a id="post-preview-comments-hide" href="#" class="hidden post-preview-button post-preview-small-button"><i class="fa fa-angle-left fa-fw"></i></a>
+                
+                <a id="post-preview-comments-show" href="#" class="hidden post-preview-button post-preview-small-button"><i class="fa fa-angle-right fa-fw"></i></a>
+
+                <a id="post-preview-comments-inline" href="#" class="hidden post-preview-button post-preview-small-button" title="Toggle inline comments"><i class="fa fa-tasks fa-fw"></i></a>
+
+                <a id="post-preview-comments-align" href="#" class="hidden post-preview-button post-preview-small-button" title="Toggle comments alignment"><i class="fa fa-long-arrow-right fa-fw"></i></a>
+              </div>
+
+              <div id="post-preview-comments" class="hidden">
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      $(document).ready(function() {
+        
+        $('.list-group-item.sub').on('click', function(event) {
+          event.preventDefault();
+          $(this).next().toggleClass('active');
+        });
+
+        $('.sub-items .list-group-item.active').each(function() {
+          $(this).parent().addClass('active');
+          // $(this).parent().prev().toggleClass('active');
+        });
+
+        // Lazyload Images
+
+        $("img.lazyload").lazyload();
+
+        // Correct datetime
+
+        $('.item-post td.date').each(function() {
+          var created_utc = $(this).attr('data-created-utc');
+          if (created_utc) {
+            created_utc = parseInt(created_utc);
+            $(this).text(moment(created_utc).format('MMM DD, YYYY hh:mm A'));
+          }
+        });
+
+        // Open external link correctly
+
+        $('.open-external-link').on('click', function(event) {
+          event.stopPropagation();
+        });
+
+        $('.open-in-new-tab').on('click', function(event) {
+          event.stopPropagation();
+          event.preventDefault();
+
+          var post_url = $(this).attr('data-post-url');
+          if (post_url && post_url != '') {
+            window.location.href = post_url;
+          }
+        });
+
+        $('#toggle-add-blog-form').on('click', function(event) {
+          event.preventDefault();
+          $('#add-blog-form').toggleClass('hidden');
+        });
+
+        $('#toggle-search-post-form').on('click', function(event) {
+          event.preventDefault();
+          $('#search-post-form').toggleClass('hidden');
+        });
+
+        $('#add-blog-form').on('submit', function(event) {
+          event.preventDefault();
+          var blog_name = $('#blog-name').val().trim();
+          if (blog_name && blog_name != '') {
+            var $button = $('#add-blog-form-submit');
+            var button_text = $button.text();
+            var resetButtonText = function(){ $button.text(button_text); };
+
+            $button.text('Adding...');
+            $.post('/add_blog?blog=' + encodeURIComponent(blog_name), function(data) {
+              console.log(data);
+              if (data && data.queued) {
+                $button.text('Queued!');
+                setTimeout(resetButtonText, 2000);
+              } else if (data && data.error) {
+                $button.text('Error!');
+                setTimeout(resetButtonText, 2000);
+              } else {
+                resetButtonText();
+              }
+            }).fail(function(data) {
+              console.log(data);
+              if (data.responseJSON && data.responseJSON.error) {
+                $button.text('Error!');
+                setTimeout(resetButtonText, 2000);
+              } else {
+                $button.text('Error!');
+                setTimeout(resetButtonText, 2000);
+              }
+            });
+          }
+        });
+
+        $('.tumblr-add-blog').on('click', function(event) {
+          event.preventDefault();
+          var blog_name = $(this).attr('data-blog-name');
+          if (blog_name && blog_name != '') {
+            var $button = $(this);
+            var button_text = $button.text();
+            var resetButtonText = function(){ $button.text(button_text); };
+
+            $button.text('adding...');
+            $.post('/add_blog?blog=' + encodeURIComponent(blog_name), function(data) {
+              console.log(data);
+              if (data && data.queued) {
+                $button.html('<span class="text-success">queued!</span>');
+                setTimeout(resetButtonText, 2000);
+              } else if (data && data.error) {
+                $button.html('<span class="text-danger">error: ' + data.error + '</span>');
+                setTimeout(resetButtonText, 2000);
+              } else {
+                resetButtonText();
+              }
+            }).fail(function(data) {
+              console.log(data);
+              if (data.responseJSON && data.responseJSON.error) {
+                $button.html('<span class="text-danger">error: ' + data.responseJSON.error + '</span>');
+                setTimeout(resetButtonText, 2000);
+              } else {
+                $button.html('<span class="text-danger">error: ' + data.statusText + '</span>');
+                setTimeout(resetButtonText, 2000);
+              }
+            });
+          }
+        });
+
+        $('.tumblr-download-posts').on('click', function(event) {
+          event.preventDefault();
+          
+          var tag_name = $(this).attr('data-tag-name');
+          var reblog_name = $(this).attr('data-reblog-name');
+          var query = $(this).attr('data-query');
+          var origin_name = $(this).attr('data-origin-name');
+
+          var $button = $(this);
+          var button_text = $button.text();
+          var resetButtonText = function(){ $button.text(button_text); };
+
+          var query_array = [];
+          if (tag_name) query_array.push('tag=' + encodeURIComponent(tag_name));
+          if (reblog_name) query_array.push('reblog=' + encodeURIComponent(reblog_name));
+          if (origin_name) query_array.push('origin=' + encodeURIComponent(origin_name));
+          if (query) query_array.push('q=' + encodeURIComponent(query));
+
+          var post_url = '/download_posts';
+          if (query_array.length) post_url += '?' + query_array.join('&');
+
+          $button.text('downloading...');
+          $.post(post_url, function(data) {
+            console.log(data);
+            if (data && data.queued) {
+              $button.html('<span class="text-success">queued!</span>');
+              setTimeout(resetButtonText, 2000);
+            } else if (data && data.error) {
+              $button.html('<span class="text-danger">error: ' + data.error + '</span>');
+              setTimeout(resetButtonText, 4000);
+            } else {
+              resetButtonText();
+            }
+          }).fail(function(data) {
+            console.log(data);
+            if (data.responseJSON && data.responseJSON.error) {
+              $button.html('<span class="text-danger">error: ' + data.responseJSON.error + '</span>');
+              setTimeout(resetButtonText, 4000);
+            } else {
+              $button.html('<span class="text-danger">error: ' + data.statusText + '</span>');
+              setTimeout(resetButtonText, 2000);
+            }
+          });
+        });
+
+        $('.toggle-this-blog-star').on('click', function(event) {
+          event.preventDefault();
+          var blog_name = $(this).attr('data-blog');
+          if (blog_name && blog_name != '') {
+            var $button = $(this);
+            var is_starred = $button.attr('data-starred') == 'true';
+            var button_text = $button.text();
+            var resetButtonText = function(){ $button.text(button_text); };
+
+            $button.html('<span><i class="fa fa-spinner fa-pulse fa-fw"></i>');
+
+            if (!is_starred) {
+              $.post('/star?blog=' + encodeURIComponent(blog_name), function(data) {
+                console.log(data);
+                if (data && data.starred) {
+                  $button.html('<span><i class="fa fa-star fa-fw"></i>');
+                  $button.attr('data-starred', true);
+                  window.location.href = '/';
+                } else {
+                  $button.html('<span><i class="fa fa-star-o fa-fw"></i>');
+                }
+              }).fail(function(data) {
+                console.log(data);
+                if (data.responseJSON && data.responseJSON.error) {
+                  $button.html('<span><i class="fa fa-star-o fa-fw"></i>');
+                } else {
+                  $button.html('<span><i class="fa fa-star-o fa-fw"></i>');
+                }
+              });
+            } else {
+              $.post('/unstar?blog=' + encodeURIComponent(blog_name), function(data) {
+                console.log(data);
+                if (data && data.unstarred) {
+                  $button.html('<span><i class="fa fa-star-o fa-fw"></i>');
+                  $button.attr('data-starred', false);
+                  window.location.href = '/';
+                } else {
+                  $button.html('<span><i class="fa fa-star fa-fw"></i>');
+                }
+              }).fail(function(data) {
+                console.log(data);
+                if (data.responseJSON && data.responseJSON.error) {
+                  $button.html('<span><i class="fa fa-star fa-fw"></i>');
+                } else {
+                  $button.html('<span><i class="fa fa-star fa-fw"></i>');
+                }
+              });
+            }
+          }
+        });
+
+        /* Realtime Communication */
+
+        // var socket = io();
+        // socket.on('scraping', function(data){
+        //   $('#blog-status').text('Scraping...');
+        //   $('#blog-status').removeClass('hidden');
+        // });
+        // socket.on('scraping-done', function(data){
+        //   $('#blog-status').text('Scraping... Done');
+        //   // $('#blog-status').addClass('hidden');
+        //   if (!is_previewing && data && data.new_posts_count) {
+        //     window.location.href = '/';
+        //   }
+        // });
+        // socket.on('scraping-progress', function(data){
+        //   if (data && data.new_posts_count) {
+        //     $('#blog-status').text('Scraping... ' + data.new_posts_count);
+        //   }
+        // });
+
+        /* Post Preview */
+
+        var current_index = -1;
+
+        var is_previewing = false;
+
+        var previewable_posts_count = 0;
+        var previewable_posts_index_map = {};
+
+        var post_preview_image_size = 'fit'; // 'fit', 'fit-width', 'fit-height', 'max'
+
+        var isPhotoPost = function($item) {
+          return $item.hasClass('item-post-photo');
+        }
+        var isVideoPost = function($item) {
+          return $item.hasClass('item-post-video');
+        }
+
+        function escapeRegExp(string) {
+          return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+        }
+
+        function replaceAll(string, find, replace) {
+          return string.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+        }
+
+        function unescapeHtml(safe) {
+          return safe.replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&quot;/g, '"')
+            .replace(/&#039;/g, "'");
+        }
+
+        var getNextPreviewItem = function() {
+
+          var next_index = current_index+1;
+          // console.log('Index:', current_index);
+
+          if (next_index >= $('table#items tbody tr').length) {
+            return null;
+          }
+
+          current_index = next_index;
+
+          var $item = $('table#items tbody tr').eq(current_index);
+          if ($item) {
+            if (isPhotoPost($item) || isVideoPost($item)) {
+              return $item;
+            } else {
+              return getNextPreviewItem();
+            }
+          } else {
+            return getNextPreviewItem();
+          }
+        }
+
+        var getPrevPreviewItem = function() {
+
+          if (current_index == 0) {
+            return null;
+          }
+
+          current_index = current_index-1;
+          // console.log('Index:', current_index);
+
+          var $item = $('table#items tbody tr').eq(current_index);
+          if ($item) {
+            if (isPhotoPost($item) || isVideoPost($item)) {
+              return $item;
+            } else {
+              return getPrevPreviewItem();
+            }
+          } else {
+            return getPrevPreviewItem();
+          }
+        }
+
+        var getPhotoFileName = function(photo_src) {
+          var filename = photo_src.split('?')[0];
+          filename = filename.substring(filename.lastIndexOf('/')+1);
+          return filename;
+        }
+
+        var previewPhotoPost = function($item, post_id, post_link, post_info) {
+          $('#post-preview-file-info').text('Photo');
+
+          $('#post-preview-content').html(
+            '<span style="display: inline-block;height: 100%;vertical-align: middle;"></span>'
+          );
+
+          $.getJSON('/post?post_id=' + post_id, function(data) {
+            console.log(data);
+
+            if (data && data.error) {
+              console.log(data.error);
+              $('#post-preview-content').html(
+                '<span style="display: inline-block;height: 100%;vertical-align: middle;"></span>' + 
+                '<span style="display: inline-block;color: white;">' + data.error + '</span>'
+                );
+            } else if (data) {
+              var photos_count = (data.photos.length||1);
+              $('#post-preview-file-info').text('Photo (' + photos_count + 'p)');
+
+              if (data['note-count']) {
+                $('#post-preview-tags-container').append(
+                  '<div class="post-preview-tag"><span><a href="#"><i class="fa fa-fire fa-fw"></i> ' + 
+                  data['note-count'] + '</a></span></div>'
+                );
+              }
+              if (data['reblogged-from-name']) {
+                $('#post-preview-tags-container').append(
+                  '<div class="post-preview-tag"><span><a href="/?reblog=' + encodeURIComponent(data['reblogged-from-name']) + 
+                  '"><i class="fa fa-retweet fa-fw"></i> ' + data['reblogged-from-name'] + '</a></span></div>'
+                );
+              }
+              if (data['reblogged-root-name'] && data['reblogged-root-name'] != data['reblogged-from-name']) {
+                $('#post-preview-tags-container').append(
+                  '<div class="post-preview-tag"><span><a href="/?origin=' + encodeURIComponent(data['reblogged-root-name']) + 
+                  '"><i class="fa fa-retweet fa-fw"></i> ' + data['reblogged-root-name'] + '</a></span></div>'
+                );
+              }
+              var is_post_live = $item.attr('data-post-live') == 'true';
+              if (data.tags) {
+                data.tags.forEach(function(tag_name) {
+                  if (is_post_live) {
+                    $('#post-preview-tags-container').append('<div class="post-preview-tag"><span><a href="/?live_tag=' + 
+                      encodeURIComponent(tag_name) + '"><i class="fa fa-tag fa-fw"></i> ' + tag_name + '</a></span></div>');
+                  } else {
+                    $('#post-preview-tags-container').append('<div class="post-preview-tag"><span><a href="/?tag=' + 
+                      encodeURIComponent(tag_name) + '"><i class="fa fa-tag fa-fw"></i> ' + tag_name + '</a></span></div>');
+                  }
+                });
+              }
+
+              var preview_html = 
+                '<span style="display: inline-block;height: 100%;vertical-align: middle;"></span>';
+
+              var photo_url_large = data['photo-url-1280'] || data['photo-url-500'];
+              // console.log(photo_url_large);
+
+              preview_html += '<img src="/tumblr_photo/' + getPhotoFileName(photo_url_large) + '?src=' + encodeURIComponent(photo_url_large) + 
+                '" class="fadeIn animated ' + (post_preview_image_size||'fit') + '" alt="Photo - 1">';
+
+              if (data.photos && data.photos.length) {
+                for (var i = 0; i < data.photos.length; i++) {
+                  var photo_src = data.photos[i]['photo-url-1280'] || data.photos[i]['photo-url-500'];
+                  if (photo_src != photo_url_large) {
+                    preview_html += '<img src="/tumblr_photo/' + getPhotoFileName(photo_src) + '?src=' + encodeURIComponent(photo_src) + 
+                      '" class="fadeIn animated extra ' + (post_preview_image_size||'fit-width') + '" alt="Photo - ' + (i+1) + '">';
+                  }
+                }
+              } 
+              // else {
+              //   preview_html += '<img src="/tumblr_photo/' + getPhotoFileName(photo_src) + '?src=' + encodeURIComponent(photo_url_large) + 
+              //     '" class="fadeIn animated extra ' + (post_preview_image_size||'fit-width') + '" alt="Photo - 1">';
+              // }
+
+              $('#post-preview-content').html(preview_html);
+              $('#post-preview-content img:first-child').focus();
+            } else {
+              $('#post-preview-content').html(
+                '<span style="display: inline-block;height: 100%;vertical-align: middle;"></span>' + 
+                '<span style="display: inline-block;color: white;">Missing post data</span>'
+                );
+            }
+          }).fail(function(data) {
+            console.log(data);
+            if (data.responseJSON && data.responseJSON.error) {
+              $('#post-preview-content').html(
+                '<span style="display: inline-block;height: 100%;vertical-align: middle;"></span>' + 
+                '<span style="display: inline-block;color: white;">' + data.responseJSON.error + '</span>'
+                );
+            } else {
+              $('#post-preview-content').html(
+                '<span style="display: inline-block;height: 100%;vertical-align: middle;"></span>'
+                );
+            }
+          });
+
+          $("#previewModal").modal('show');
+        }
+
+        var previewVideoPost = function($item, post_id, post_link, post_info) {
+          $('#post-preview-file-info').text('Video');
+
+          $.getJSON('/post?post_id=' + post_id, function(data) {
+            console.log(data);
+            if (data && data.error) {
+              console.log(data.error);
+              $('#post-preview-content').html(
+                '<span style="display: inline-block;height: 100%;vertical-align: middle;"></span>' + 
+                '<span style="display: inline-block;color: white;">' + data.error + '</span>'
+                );
+            } else if (data) {
+
+              if (data['note-count']) {
+                $('#post-preview-tags-container').append(
+                  '<div class="post-preview-tag"><span><a href="#"><i class="fa fa-fire fa-fw"></i> ' + 
+                  data['note-count'] + '</a></span></div>'
+                );
+              }
+              if (data['reblogged-from-name']) {
+                $('#post-preview-tags-container').append('<div class="post-preview-tag"><span><a href="/?reblog=' + 
+                  encodeURIComponent(data['reblogged-from-name']) + 
+                  '"><i class="fa fa-retweet fa-fw"></i> ' + data['reblogged-from-name'] + '</a></span></div>');
+              }
+              if (data.tags) {
+                data.tags.forEach(function(tag_name) {
+                  $('#post-preview-tags-container').append('<div class="post-preview-tag"><span><a href="/?tag=' + 
+                    encodeURIComponent(tag_name) + '"><i class="fa fa-tag fa-fw"></i> ' + tag_name + '</a></span></div>');
+                });
+              }
+
+              if (data['video-source'] && data['video-source'].indexOf('http')==0) {
+                $('#post-preview-external-link-button').attr('href', data['video-source']);
+              }
+
+              var preview_html = 
+                '<span style="display: inline-block;height: 100%;vertical-align: middle;"></span>';
+              preview_html += '<div style="display: inline-block;height: 100%;color: white;">';
+              preview_html += data['video-player'];
+              preview_html += data['video-caption'];
+              preview_html += '</div>';
+
+              $('#post-preview-content').html(preview_html);
+            } else {
+              $('#post-preview-content').html(
+                '<span style="display: inline-block;height: 100%;vertical-align: middle;"></span>' + 
+                '<span style="display: inline-block;color: white;">Missing post data</span>'
+                );
+            }
+          }).fail(function(data) {
+            console.log(data);
+            if (data.responseJSON && data.responseJSON.error) {
+              $('#post-preview-content').html(
+                '<span style="display: inline-block;height: 100%;vertical-align: middle;"></span>' + 
+                '<span style="display: inline-block;color: white;">' + data.responseJSON.error + '</span>'
+                );
+            } else {
+              $('#post-preview-content').html(
+                '<span style="display: inline-block;height: 100%;vertical-align: middle;"></span>'
+                );
+            }
+          });
+
+          $("#previewModal").modal('show');
+        }
+
+        var previewItem = function($item) {
+          if ($item) {
+            var post_id = $item.attr('data-post-id');
+            var post_link = $item.attr('data-post-link');
+            var post_info = {
+              title: $item.attr('data-post-title'),
+              permalink: $item.attr('data-post-permalink'),
+              reblog: $item.attr('data-post-reblog'),
+              blog: $item.attr('data-post-blog'),
+              created: parseInt($item.attr('data-post-created'))
+            };
+            // console.log('Preview:', post_link);
+
+            $('#post-preview-item-title').text($item.attr('data-post-title'));
+            $('#post-preview-external-link-button').attr('href', post_link);
+
+            if ($item.attr('data-post-favorite') == 'false') {
+              $('#post-preview-favorite-button').html('<i class="fa fa-heart-o fa-lg fa-fw"></i>');
+            } else {                
+              $('#post-preview-favorite-button').html('<i class="fa fa-heart fa-lg fa-fw"></i>');
+            }
+            $('#post-preview-open-tumblr-button').attr('href', $item.attr('data-post-permalink'));
+
+            // $('#post-preview-file-info').text($item.attr('data-post-type').toUpperCase() 
+            //   + ' - ' + $item.attr('data-post-size'));
+            var index = previewable_posts_index_map[$item.index()];
+            $('#post-preview-subtitle').text('' + (index+1) + ' of ' + previewable_posts_count);
+
+            // $('#post-preview-item-title-container').removeClass('hidden');
+            $('#post-preview-tags-container').html('');
+
+            if (isPhotoPost($item)) {
+              previewPhotoPost($item, post_id, post_link, post_info);
+            } else if (isVideoPost($item)) {
+              previewVideoPost($item, post_id, post_link, post_info);
+            }
+          }
+        }
+
+        var previewNextItem = function() {
+          var $item = getNextPreviewItem();
+          if ($item) {
+            $('table#items tbody tr').removeClass('info');
+            $item.addClass('info');
+
+            previewItem($item);
+          }
+        }
+
+        var previewPrevItem = function() {
+          var $item = getPrevPreviewItem();
+          if ($item) {
+            $('table#items tbody tr').removeClass('info');
+            $item.addClass('info');
+
+            previewItem($item);
+          }
+        }
+
+        var togglePreviewImageSize = function() {
+          // 'fit' -> 'fit-width' -> 'fit-height' -> 'max' -> 'fit' -> ...
+          if (post_preview_image_size == 'fit') {
+            post_preview_image_size = 'fit-width';
+            $('#post-preview-image-resize-button').html('<i class="fa fa-arrows-h fa-lg fa-fw"></i>');
+            $('#post-preview-content img').removeClass('fit').addClass('fit-width');
+          } else if (post_preview_image_size == 'fit-width') {
+            post_preview_image_size = 'fit-height';
+            $('#post-preview-image-resize-button').html('<i class="fa fa-arrows-v fa-lg fa-fw"></i>');
+            $('#post-preview-content img').removeClass('fit-width').addClass('fit-height');
+          } else if (post_preview_image_size == 'fit-height') {
+            post_preview_image_size = 'max';
+            $('#post-preview-image-resize-button').html('<b style="font-size: 16px;line-height: 12px;">1:1</b>');
+            $('#post-preview-content img').removeClass('fit-height').addClass('max');
+          } else {
+            post_preview_image_size = 'fit';
+            $('#post-preview-image-resize-button').html('<i class="fa fa-arrows fa-lg fa-fw"></i>');
+            $('#post-preview-content img').removeClass('max').addClass('fit');
+          }
+        }
+
+        // Download Post
+
+        var downloadCurrentPost = function() {
+          if (current_index != -1) {
+            var $item = $('table#items tbody tr').eq(current_index);
+            if ($item) {
+              var post_id = $item.attr('data-post-id');
+              if (post_id) downloadPost(post_id);
+            }
+          }
+        }
+
+        var showPreviewDownloadNotification = function(message, timeout) {
+          $('#post-preview-download-notification').html(message);
+          $('#post-preview-download-notification').removeClass('hidden');
+          setTimeout(function() {
+            $('#post-preview-download-notification').addClass('hidden');
+            $('#post-preview-download-notification').html('');
+          }, timeout || 3000);
+        }
+
+        var downloadPost = function(post_id) {
+          $('#post-preview-download-button').html('<i class="fa fa-spinner fa-pulse fa-lg fa-fw"></i>');
+          // console.log('Download post:', post_id);
+          $.post('/download_post?post_id=' + post_id, function(data) {
+            $('#post-preview-download-button').html('<i class="fa fa-download fa-lg fa-fw"></i>');
+            console.log(data);
+            if (data && data.downloaded) {
+              showPreviewDownloadNotification('Downloaded!');
+            } else if (data && data.error) {
+              showPreviewDownloadNotification(data.error);
+            }
+          });
+        }
+
+        // Favorite & Unfavorite Post
+
+        var toggleCurrentPostFavorite = function() {
+          if (current_index != -1) {
+            var $item = $('table#items tbody tr').eq(current_index);
+            if ($item) {
+              var post_id = $item.attr('data-post-id');
+              if (post_id && $item.attr('data-post-favorite') == 'false') {
+                favoritePost(post_id, function(favorited) {
+                  if (favorited) $item.attr('data-post-favorite', 'true');
+                });
+              } else if (post_id) {
+                unfavoritePost(post_id, function(unfavorited) {
+                  if (unfavorited) $item.attr('data-post-favorite', 'false');
+                });
+              }
+            }
+          }
+        }
+
+        var showPreviewFavoriteNotification = function(message, timeout) {
+          $('#post-preview-favorite-notification').html(message);
+          $('#post-preview-favorite-notification').removeClass('hidden');
+          setTimeout(function() {
+            $('#post-preview-favorite-notification').addClass('hidden');
+            $('#post-preview-favorite-notification').html('');
+          }, timeout || 3000);
+        }
+
+        var favoritePost = function(post_id, done) {
+          $('#post-preview-favorite-button').html('<i class="fa fa-spinner fa-pulse fa-lg fa-fw"></i>');
+          // console.log('Download post:', post_id);
+          $.post('/favorite?post_id=' + post_id, function(data) {
+            console.log(data);
+            if (data && data.favorited) {
+              $('#post-preview-favorite-button').html('<i class="fa fa-heart fa-lg fa-fw"></i>');
+              $('#post-favorite-'+post_id).html('<i class="fa fa-heart fa-fw"></i>');
+              showPreviewFavoriteNotification('Favorited!');
+              return done(true);
+            } else if (data && data.error) {
+              $('#post-preview-favorite-button').html('<i class="fa fa-heart-o fa-lg fa-fw"></i>');
+              $('#post-favorite-'+post_id).html('<i class="fa fa-heart-o fa-fw"></i>');
+              showPreviewFavoriteNotification(data.error);
+            } else {
+              $('#post-preview-favorite-button').html('<i class="fa fa-heart-o fa-lg fa-fw"></i>');
+              $('#post-favorite-'+post_id).html('<i class="fa fa-heart-o fa-fw"></i>');
+            }
+            return done();
+          });
+        }
+
+        var unfavoritePost = function(post_id, done) {
+          $('#post-preview-favorite-button').html('<i class="fa fa-spinner fa-pulse fa-lg fa-fw"></i>');
+          // console.log('Download post:', post_id);
+          $.post('/unfavorite?post_id=' + post_id, function(data) {
+            console.log(data);
+            if (data && data.unfavorited) {
+              $('#post-preview-favorite-button').html('<i class="fa fa-heart-o fa-lg fa-fw"></i>');
+              $('#post-favorite-'+post_id).html('<i class="fa fa-heart-o fa-fw"></i>');
+              showPreviewFavoriteNotification('Unfavorited!');
+              return done(true);
+            } else if (data && data.error) {
+              $('#post-preview-favorite-button').html('<i class="fa fa-heart fa-lg fa-fw"></i>');
+              $('#post-favorite-'+post_id).html('<i class="fa fa-heart fa-fw"></i>');
+              showPreviewFavoriteNotification(data.error);
+            } else {
+              $('#post-preview-favorite-button').html('<i class="fa fa-heart fa-lg fa-fw"></i>');
+              $('#post-favorite-'+post_id).html('<i class="fa fa-heart fa-fw"></i>');
+            }
+            return done();
+          });
+        }
+
+        /* Post Preview Events */
+
+        var windowHeight = function() {
+          return window.innerHeight ? window.innerHeight : $(window).height();
+        }
+
+        var closePreviewModal = function() {
+          if ($('#previewModal').hasClass('in')) {
+            $('#previewModal').modal('toggle');
+            $('#post-preview-content').html('');
+          }
+        }
+
+        $('#previewModal').on('show.bs.modal', function () {
+          is_previewing = true;
+          // $('#previewModal .modal-body').css('overflow-y', 'auto'); 
+          // $('#previewModal .modal-body').css('height', windowHeight() - 15);
+          if (window.matchMedia && window.matchMedia('(max-width: 768px)').matches) {
+            $('#previewModal .modal-body').css('height', windowHeight());
+          } else {
+            $('#previewModal .modal-body').css('height', windowHeight() - 15);
+          }
+        });
+
+        $('#previewModal').on('hide.bs.modal', function () {
+          is_previewing = false;
+          $('#post-preview-content').html('');
+        });
+
+        $(window).resize(function() {
+          if (is_previewing) {
+            if (window.matchMedia && window.matchMedia('(max-width: 768px)').matches) {
+              $('#previewModal .modal-body').css('height', windowHeight());
+            } else {
+              $('#previewModal .modal-body').css('height', windowHeight() - 15);
+            }
+          }
+        });
+
+        $(document).on('keydown', function (event) {
+          // console.log('Keydown:', event.keyCode || event.which);
+          if (is_previewing) {
+            if (event.shiftKey || event.ctrlKey || event.altKey || event.metaKey) return;
+            var keycode = event.keyCode || event.which;
+            if (keycode == 37) { // left
+              previewPrevItem();
+            } else if (keycode == 39) { // right
+              previewNextItem();
+            } else if (keycode == 27) { // esc
+              closePreviewModal();
+            } else if (keycode == 68) { // 'd'
+              downloadCurrentPost();
+            } else if (keycode == 70) { // 'f' 
+              toggleCurrentPostFavorite();
+            } else if (keycode == 83) { // 's' 
+              togglePreviewImageSize();
+            }
+          }
+        });
+
+        $('#post-preview-content').on('click', function(event) {
+          event.preventDefault();
+          // $('#post-preview-header').toggleClass('hidden');
+          $('#post-preview-item-title-container').toggleClass('hidden');
+          $('#post-preview-actions').toggleClass('hidden');
+          $('#post-preview-tags-container').toggleClass('hidden');
+        });
+
+        $('#post-preview-next').on('click', function(event) {
+          event.preventDefault();
+          previewNextItem();
+        });
+
+        $('#post-preview-prev').on('click', function(event) {
+          event.preventDefault();
+          previewPrevItem();
+        });
+
+        $('#post-preview-right').on('click', function(event) {
+          event.preventDefault();
+          previewNextItem();
+        });
+
+        $('#post-preview-left').on('click', function(event) {
+          event.preventDefault();
+          previewPrevItem();
+        });
+
+        $('#post-preview-download-button').on('click', function(event) {
+          event.preventDefault();
+          downloadCurrentPost();
+        });
+
+        $('#post-preview-favorite-button').on('click', function(event) {
+          event.preventDefault();
+          toggleCurrentPostFavorite();
+        });
+
+        $('#post-preview-image-resize-button').on('click', function(event) {
+          event.preventDefault();
+          togglePreviewImageSize();
+        });
+
+        $('#post-preview-close-button').on('click', function(event) {
+          event.preventDefault();
+          closePreviewModal();
+        });
+
+        $('#post-preview-close').on('click', function(event) {
+          event.preventDefault();
+          closePreviewModal();
+        });
+
+        $('table#items tbody tr').each(function() {
+          var $item = $(this);
+
+          if (isPhotoPost($item) || isVideoPost($item)) {
+            previewable_posts_index_map[$item.index()] = previewable_posts_count;
+            previewable_posts_count++;
+          }
+        });
+
+        $('table#items tbody tr').on('click', function(event) {
+          // event.preventDefault();
+          var $item = $(this);
+
+          if (isPhotoPost($item) || isVideoPost($item)) {
+            $('table#items tbody tr').removeClass('info');
+            $item.addClass('info');
+
+            current_index = $item.index();
+
+            previewItem($item);
+          }
+        });
+
+        $('#post-preview-file-info-toggle').on('click', function() {
+          $('#post-preview-file-info').toggleClass('hidden');
+        });
+
+      })
+    </script>
+  </body>
+</html>

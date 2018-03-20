@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tumblr Archive Browser</title>
+
+    <meta name="referrer" content="no-referrer">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css">
+    
+    <style type="text/css">
+      .btn-sm {
+        padding: 3px 7px;
+      }
+    </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <h3 style="text-align: center;">
+      <span class="text-primary"><i class="fa fa-tumblr fa-fw"></i> <a href="/" style="text-decoration: none;">Tumblr Archive Browser</a></span>
+    </h3>
+
+    <div class="row login" style="margin-bottom: 20px;">
+      <div class="col-md-6 col-md-offset-3 col-sm-10 col-sm-offset-1">
+        <h5>Please enter password to login:</h5>
+        <form id="login-form" role="form" action="/login" method="POST">
+          <div class="input-group">
+            <input id="login-password" type="password" name="password" class="form-control" value="" 
+              placeholder="Enter password">
+            <span class="input-group-btn">
+              <button class="btn btn-default" type="submit"> Enter</button>
+            </span>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div><!-- container -->
+
+</body>
+</html>

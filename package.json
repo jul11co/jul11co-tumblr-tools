@@ -1,0 +1,38 @@
+{
+  "name": "jul11co-tumblr-tools",
+  "version": "0.0.1",
+  "description": "Tumblr tools",
+  "author": "Jul11Co <jul.eleven.co@gmail.com>",
+  "bin": {
+    "tumblr-archive": "./tumblr-archive.js",
+    "tumblr-browse-posts": "./tumblr-browse-posts.js",
+    "tumblr-download-posts": "./tumblr-download-posts.js",
+    "tumblr-export-posts": "./tumblr-export-posts.js",
+    "tumblr-scrape-bot": "./tumblr-scrape-bot.js",
+    "tumblr-scrape": "./tumblr-scrape.js"
+  },
+  "dependencies": {
+    "async": "^2.3.0",
+    "body-parser": "^1.18.2",
+    "bytes": "^3.0.0",
+    "chalk": "^1.1.3",
+    "cli-spinner": "^0.2.6",
+    "cookie-parser": "^1.4.3",
+    "ejs": "^2.5.7",
+    "express": "^4.16.2",
+    "express-session": "^1.15.6",
+    "fs-extra": "^2.1.2",
+    "jul11co-jobqueue": "0.0.1",
+    "jul11co-jsonstore": "0.0.1",
+    "jul11co-sitescraper": "0.0.2",
+    "jul11co-utils": "^0.1.0",
+    "jul11co-wdt": "^1.1.12",
+    "lockfile": "^1.0.3",
+    "moment": "^2.18.1",
+    "nedb": "^1.8.0",
+    "open": "0.0.5",
+    "pretty-seconds": "^0.2.1",
+    "request": "^2.83.0",
+    "socket.io": "^2.0.4"
+  }
+}

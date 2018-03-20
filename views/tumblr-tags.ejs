@@ -1,0 +1,97 @@
+<html>
+  <head>
+    <title>Tumblr Archive Browser</title>
+
+    <meta name="referrer" content="no-referrer">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/animate.css"> -->
+
+    <link rel="stylesheet" href="/css/app.min.css">
+
+    <!-- <script src="/js/jquery-3.2.1.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/jquery.lazyload.min.js"></script>
+    <script src="/js/socket.io.slim.js"></script>
+    <script src="/js/moment.min.js"></script>
+    <script src="/js/snuownd.min.js"></script> -->
+
+    <script src="/js/app.min.js"></script>
+
+    <style type="text/css">
+      table#items tr.item-post {
+        cursor: pointer;
+      }
+      .scrollable-menu {
+        height: auto;
+        max-height: 400px;
+        overflow-x: hidden;
+      }
+      #sidebar {
+        float: left;
+        width: 200px;
+      }
+      #sidebar ul {
+        list-style: none;
+        padding-left: 0;
+      }
+      #main-content {
+        margin-left: 220px;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class="container">
+
+      <h3>
+        <span class="text-primary"><i class="fa fa-tumblr fa-fw"></i> <a href="/" style="text-decoration: none;">Tumblr Archive Browser</a></span>
+      </h3>
+
+      <div class="row">
+        <div class="col-md-12">
+
+        <p>
+          <a href="/"><b>All Posts</b> (<%=posts_count%>)</a>,
+          <a href="/?favorites=1"><b>Favorites</b> (<%=favorite_posts_count%>)</a>
+        </p>
+
+        <%if (popular_tags && popular_tags.length) {%>
+        <p>
+          Popular tags: 
+          <%popular_tags.forEach(function(tag,idx){%>
+          <a href="/?tag=<%=tag.name%>">#<%=tag.name%> (<%=tag.posts_count%>)</a><%if(idx<popular_tags.length-1){%>,<%}%>
+          <%});%>
+        </p>
+         <%}%>
+
+        <h3>All Tags</h3>
+
+        <%if (all_tags.length != 1) {%>
+        <h5><%=all_tags.length%> Tags</h5>
+        <%} else {%>
+        <h5>1 Tag</h5>
+        <%}%>
+
+        <%for (var group_name in grouped_tags){%>
+          <%var tag_group = grouped_tags[group_name];%>
+          <%if (tag_group.length > 0){%>
+        <p>
+          <h4 style="color: grey;"><%=group_name%> <small>(<%=tag_group.length%>)</small></h4>
+          <%tag_group.forEach(function(tag,idx){%>
+          <a href="/?tag=<%=tag.name%>">#<%=tag.name%> (<%=tag.posts_count%>)</a><%if(idx < tag_group.length-1){%>,<%}%>
+           <%});%>
+        </p>
+          <%}%>
+        <%}%>
+        
+      </div>
+      </div><!-- row -->
+
+    </div><!-- container -->
+
+  </body>
+</html>
